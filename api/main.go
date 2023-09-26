@@ -1,44 +1,38 @@
 package main
 
 import (
-	"net/http"
+	"log"
+	"os"
 
-	"github.com/labstack/echo/v4"
+	"github.com/dzeleniak/arnold/controllers"
+	database "github.com/dzeleniak/arnold/db"
+	"github.com/dzeleniak/arnold/services"
+	"github.com/dzeleniak/arnold/stores"
 )
 
+var GO_ENV = os.Getenv("GO_ENV")
+
 func main() {
-	e := echo.New()
-	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "GET: /");
-	})
+	db, err := database.New(GO_ENV == "development")
+	if err != nil {
+		log.Fatal("Failed to connect to database")
+	}
 
-	e.POST("/", func(c echo.Context) error { 
-		return c.String(http.StatusOK, "POST: /");
-	})
+	defer db.Close();
 
-	e.PUT("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "PUT: /");
-	})
+	e := controllers.Echo()
 
-	e.DELETE("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Delete: /")
-	})
+	s := stores.New(db)
+	ss := services.New(s)
+	c := controllers.New(ss)
 
-	e.GET("/Movements", func(c echo.Context) error {
-		return c.String(http.StatusOK, "GET: /Movements");
-	})
+	controllers.SetApi(e, c, nil);
 
-	e.POST("/Movements", func(c echo.Context) error {
-		return c.String(http.StatusOK, "POST: /Movements");
-	})
+	PORT := os.Getenv("PORT")
 
-	e.PUT("/Movements", func(c echo.Context) error {
-		return c.String(http.StatusOK, "PUT: /Movements")
-	})
+	if PORT == "" {
+		PORT = "8888"
+	}
 
-	e.DELETE("/Movements", func(c echo.Context) error { 
-		return c.String(http.StatusOK, "DELETE: /Movements")
-	})
-
-	e.Logger.Fatal(e.Start(":1323"));
+	log.Fatal(e.Start(":"+PORT))
 }
