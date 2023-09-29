@@ -9,7 +9,7 @@ import (
 type (
 	MovementSetStore interface {
 		Get(tx *sql.Tx) ([]models.MovementSet, error)
-		Create(tx *sql.Tx, set models.MovementSet) (error)
+		Create(tx *sql.Tx, set models.MovementSet) (int64, error)
 		Update(tx *sql.Tx, set models.MovementSet) (error)
 		Delete(tx *sql.Tx, id int) (error)
 	}
@@ -40,4 +40,24 @@ func (s *movementSetStore) Get(tx *sql.Tx) ([]models.MovementSet, error) {
 	}
 
 	return sets, nil;
+}
+
+func (s *movementSetStore) Create(tx *sql.Tx, set models.MovementSet) (int64, error) {
+	var err error;
+
+	query := "INSERT INTO movementsets (movement_id, weight, repetitions) VALUES ($1, $2, $3) RETURNING id";
+
+	var id int64;
+
+	if tx != nil {
+		err = tx.QueryRow(query, set.MovementID, set.Weight, set.Repetitions).Scan(&id);
+	} else {
+		err = s.QueryRow(query, set.MovementID, set.Weight, set.Repetitions).Scan(&id);
+	}
+
+	if err != nil {
+		return 0, err;
+	}
+
+	return id, nil;
 }
