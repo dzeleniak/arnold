@@ -74,7 +74,7 @@ func (c *movementController) DeleteMovementById(ctx echo.Context) error {
 		return ctx.JSON(http.StatusBadRequest, err.Error());
 	}
 
-	err = c.MovementService.DeleteAuthor(id);
+	err = c.MovementService.DeleteMovement(id);
 
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, err.Error())

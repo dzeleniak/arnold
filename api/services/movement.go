@@ -10,7 +10,7 @@ type (
 		GetMovements() ([]models.Movement, error)
 		CreateMovement(m *models.Movement) (int64, error)
 		UpdateMovementById(m *models.Movement) (int64, error)
-		DeleteAuthor(id int) error
+		DeleteMovement(id int) error
 	}
 
 	movementService struct {
@@ -33,7 +33,7 @@ func (s *movementService) UpdateMovementById(m *models.Movement) (int64, error) 
 	return r, err;
 }
 
-func (s *movementService) DeleteAuthor(id int) error {
+func (s *movementService) DeleteMovement(id int) error {
 	err := s.stores.Movement.DeleteById(nil, id);
 	return err;
 }
