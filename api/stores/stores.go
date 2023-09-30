@@ -5,12 +5,14 @@ import "database/sql"
 type Stores struct {
 	DB *sql.DB
 	Movement *movementStore
+	MovementSet *movementSetStore
 }
 
 func New(db *sql.DB) *Stores {
 	return &Stores{
 		DB: db,
 		Movement: &movementStore{db},
+		MovementSet: &movementSetStore{db},
 	}
 }
 
