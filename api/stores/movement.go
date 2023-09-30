@@ -21,7 +21,7 @@ type (
 
 func (s *movementStore) Get(tx *sql.Tx) ([]models.Movement, error) {
 	movements := make([]models.Movement, 0);
-	rows, err := s.Query("SELECT * FROM movement;")
+	rows, err := s.Query("SELECT * FROM movements")
 
 	if err != nil {
 		return nil, err;
@@ -37,7 +37,6 @@ func (s *movementStore) Get(tx *sql.Tx) ([]models.Movement, error) {
 		
 		movements = append(movements, m);
 	}
-
 	return movements, nil;
 }
 

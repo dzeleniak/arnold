@@ -26,6 +26,7 @@ func main() {
 	ss := services.New(s)
 	c := controllers.New(ss)
 
+	controllers.SetDefault(e);
 	controllers.SetApi(e, c, nil);
 
 	PORT := os.Getenv("PORT")
