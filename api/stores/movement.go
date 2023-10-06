@@ -61,14 +61,14 @@ func (s *movementStore) Create(tx *sql.Tx, movement *models.Movement) (int64, er
 } 
 
 func (s *movementStore) UpdateById(tx *sql.Tx, movement *models.Movement) (int64, error) {
-	query, err := s.Prepare("UPDATE movements SET name = $1 WHERE movements.id = $2")
+	query, err := s.Prepare("UPDATE movements SET name = $1 WHERE movements.id = $2 RETURNING movements.id")
 	if err != nil {
 		return 0, err;
 	}
 
 	var id int64;
 
-	err = query.QueryRow(movement.Name).Scan(&id);
+	err = query.QueryRow(movement.Name, movement.ID).Scan(&id);
 
 	if id == 0 {
 		return 0, sql.ErrNoRows;
