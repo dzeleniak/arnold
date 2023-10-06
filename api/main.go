@@ -32,7 +32,7 @@ func main() {
 	PORT := os.Getenv("PORT")
 
 	if PORT == "" {
-		PORT = "8888"
+		PORT = "8080"
 	}
 
 	log.Fatal(e.Start(":"+PORT))
