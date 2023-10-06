@@ -5,6 +5,7 @@ import (
 
 	"github.com/dzeleniak/arnold/services"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 type Controllers struct {
@@ -24,10 +25,17 @@ func Echo() *echo.Echo {
 
 	return e;
 }	
+
 func SetDefault(e *echo.Echo) {
-	e.GET("/", func(ctx echo.Context) error {
-		return ctx.JSON(http.StatusOK, "Success!");
-	})
+
+	e.Pre(middleware.RemoveTrailingSlash())
+	
+	e.Use(middleware.LoggerWithConfig(
+		middleware.LoggerConfig{
+			Format: "${time_unix_milli} => ${method} => ${uri}, (${status})\n",
+		},
+	))
+
 }
 
 func SetApi(e *echo.Echo, c *Controllers, m echo.MiddlewareFunc) {
