@@ -8,6 +8,7 @@ import (
 type (
 	MovementSetService interface {
 		GetMovementSets() ([]models.MovementSet, error)
+		GetMovementSetsByMovementID(id int64) ([]models.MovementSet, error) 
 		CreateMovementSet(set *models.MovementSet) (int64, error)
 		UpdateMovementSet(set *models.MovementSet) (int64, error)
 		DeleteMovementSet(id int64) error
@@ -40,4 +41,10 @@ func (s *movementSetService) UpdateMovementSet(set *models.MovementSet) (int64, 
 func (s *movementSetService) DeleteMovementSet(id int64) error {
 	err := s.stores.MovementSet.Delete(nil, id);
 	return err;
+}
+
+func (s *movementSetService) GetMovementSetsByMovementID(id int64) ([]models.MovementSet, error) {
+	sets, err := s.stores.MovementSet.GetByMovementID(nil, id);
+
+	return sets, err;
 }

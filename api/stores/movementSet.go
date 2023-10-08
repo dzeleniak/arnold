@@ -9,6 +9,7 @@ import (
 type (
 	MovementSetStore interface {
 		Get(tx *sql.Tx) ([]models.MovementSet, error)
+		GetByMovementID(tx *sql.Tx) ([]models.MovementSet, error)
 		Create(tx *sql.Tx, set *models.MovementSet) (int64, error)
 		Update(tx *sql.Tx, set *models.MovementSet) (error)
 		Delete(tx *sql.Tx, id int) (error)
@@ -39,6 +40,28 @@ func (s *movementSetStore) Get(tx *sql.Tx) ([]models.MovementSet, error) {
 		sets = append(sets, s)
 	}
 
+	return sets, nil;
+}
+
+func (s *movementSetStore) GetByMovementID(tx *sql.Tx, id int64) ([]models.MovementSet, error) {
+	sets := make([]models.MovementSet, 0)
+
+	rows, err := s.Query("SELECT * FROM movementsets WHERE movementsets.movement_id=$1", id);
+
+	if err != nil {
+		return nil, err;
+	}
+
+	for rows.Next() {
+		var s models.MovementSet;
+
+		err := rows.Scan(&s.ID, &s.Weight, &s.Repetitions, &s.MovementID)
+		if err != nil {
+			return nil, err;
+		}
+		sets = append(sets, s)
+	}
+	
 	return sets, nil;
 }
 

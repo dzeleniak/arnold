@@ -51,6 +51,8 @@ func SetApi(e *echo.Echo, c *Controllers, m echo.MiddlewareFunc) {
 	g.PUT("/movements", c.MovementController.UpdateMovementById)
 	g.DELETE("/movements/:id", c.MovementController.DeleteMovementById)
 
+	g.GET("/movements/:id/sets", c.MovementSetController.GetMovementSetsByMovementID)
+
 	g.GET("/sets", c.MovementSetController.GetMovementSets);
 	g.POST("/sets", c.MovementSetController.CreateMovementSet);
 	g.PUT("/sets", c.MovementSetController.UpdateMovementSet);

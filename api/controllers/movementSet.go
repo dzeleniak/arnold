@@ -15,6 +15,7 @@ type (
 		CreateMovementSet(ctx echo.Context) error
 		UpdateMovementSet(ctx echo.Context) error
 		DeleteMovementSet(ctx echo.Context) error
+		GetMovementSetsByMovementID(ctx echo.Context) error
 	}	
 
 	movementSetController struct {
@@ -81,4 +82,21 @@ func (c *movementSetController) DeleteMovementSet(ctx echo.Context) error {
 	}
 
 	return ctx.JSON(http.StatusOK, id)
+}
+
+func (c *movementSetController) GetMovementSetsByMovementID(ctx echo.Context) error {
+
+	id, err := strconv.Atoi(ctx.Param("id"));
+
+	if err != nil {
+		return ctx.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	sets, err := c.MovementSetService.GetMovementSetsByMovementID(int64(id))
+
+	if err != nil {
+		return ctx.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return ctx.JSON(http.StatusOK, sets)
 }
