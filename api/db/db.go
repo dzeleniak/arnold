@@ -6,14 +6,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func New(development bool) (*sql.DB, error) {
-	var uri string;
-
-	if development {
-		uri = "arnoldDev.db"
-	} else {
-		uri = "arnoldDev.db"
-	}
+func New(uri string) (*sql.DB, error) {
 
 	db, err := sql.Open("sqlite3", uri);
 

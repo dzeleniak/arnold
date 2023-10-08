@@ -1,1 +1,3 @@
 *.db
+api/tmp
+.env

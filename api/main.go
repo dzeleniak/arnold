@@ -8,12 +8,21 @@ import (
 	database "github.com/dzeleniak/arnold/db"
 	"github.com/dzeleniak/arnold/services"
 	"github.com/dzeleniak/arnold/stores"
+	"github.com/joho/godotenv"
 )
 
-var GO_ENV = os.Getenv("GO_ENV")
+var DB_URI = os.Getenv("ARNOLD_DB_URI")
+var PORT = os.Getenv("ARNOLD_PORT")
+
+func init() {
+	err := godotenv.Load()
+	if err != nil {
+		panic(err)
+	}
+}
 
 func main() {
-	db, err := database.New(GO_ENV == "development")
+	db, err := database.New(DB_URI)
 	if err != nil {
 		log.Fatal("Failed to connect to database")
 	}
@@ -28,8 +37,6 @@ func main() {
 
 	controllers.SetDefault(e);
 	controllers.SetApi(e, c, nil);
-
-	PORT := os.Getenv("PORT")
 
 	if PORT == "" {
 		PORT = "8080"
