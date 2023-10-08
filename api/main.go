@@ -11,9 +11,6 @@ import (
 	"github.com/joho/godotenv"
 )
 
-var DB_URI = os.Getenv("ARNOLD_DB_URI")
-var PORT = os.Getenv("ARNOLD_PORT")
-
 func init() {
 	err := godotenv.Load()
 	if err != nil {
@@ -22,6 +19,11 @@ func init() {
 }
 
 func main() {
+	var DB_URI = os.Getenv("ARNOLD_DB_URI")
+	var PORT = os.Getenv("ARNOLD_PORT")
+
+	log.Printf("Initializing Database: %v", DB_URI)
+
 	db, err := database.New(DB_URI)
 	if err != nil {
 		log.Fatal("Failed to connect to database")
