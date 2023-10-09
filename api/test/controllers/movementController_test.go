@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"database/sql"
 	"errors"
 	"net/http"
 	"net/http/httptest"
@@ -73,5 +74,101 @@ func TestGetMovements500Case(t *testing.T) {
 	c := e.NewContext(req, res)
 
 	assert.NoError(t, controllers.GetMovements(c))
+	assert.Equal(t, http.StatusInternalServerError, res.Code)
+}
+
+func TestDeleteMovementSuccessCase(t *testing.T) {
+	s := &MockMovementService{
+		MockDeleteMovementById: func(id int) error {
+			return nil;
+		},
+	}
+
+	mockService := &services.Services{ Movement: s }
+
+	e := controllers.Echo()
+	controllers := controllers.New(mockService)
+
+	req := httptest.NewRequest(http.MethodDelete, "/", nil)
+	res := httptest.NewRecorder();
+
+	c := e.NewContext(req, res)
+
+	c.SetPath("api/v1/movements/:id")
+	c.SetParamNames("id")
+	c.SetParamValues("1");
+
+	assert.NoError(t, controllers.MovementController.DeleteMovementById(c));
+	assert.Equal(t, http.StatusOK, res.Code);
+}
+
+func TestDeleteMovement400Case(t *testing.T) {
+	s := &MockMovementService{
+		MockDeleteMovementById: func(id int) error {
+			return nil;
+		},
+	}
+
+	mockService := &services.Services{ Movement: s }
+
+	e := controllers.Echo();
+	controllers := controllers.New(mockService)
+
+	req := httptest.NewRequest(http.MethodDelete, "/", nil);
+	res := httptest.NewRecorder();
+
+	c := e.NewContext(req, res);
+	c.SetPath("api/v1/movements/:id")
+
+	assert.NoError(t, controllers.DeleteMovementById(c))
+	assert.Equal(t, http.StatusBadRequest, res.Code)
+}
+
+func TestDeleteMovement404Case(t *testing.T) {
+	s := &MockMovementService{
+		MockDeleteMovementById: func(id int) error {
+			return sql.ErrNoRows
+		},
+	}
+
+	mockService := &services.Services{Movement: s}
+
+	e := controllers.Echo()
+	controllers := controllers.New(mockService);
+
+	req := httptest.NewRequest(http.MethodDelete, "/", nil);
+	res := httptest.NewRecorder();
+
+	c := e.NewContext(req,res)
+	c.SetPath("api/v1/movements/:id")
+	c.SetParamNames("id")
+	c.SetParamValues("54354521")
+
+	assert.NoError(t, controllers.MovementController.DeleteMovementById(c))
+	assert.Equal(t, http.StatusNotFound, res.Code)
+}
+
+func TestDeleteMovement500Case(t *testing.T) {
+	s := &MockMovementService{
+		MockDeleteMovementById: func(id int) error {
+			return errors.New("fml :(")
+		},
+	}
+
+	mockService := &services.Services{
+		Movement: s,
+	}
+
+	e := controllers.Echo();
+	controllers := controllers.New(mockService)
+
+	req := httptest.NewRequest(http.MethodDelete, "/", nil)
+	res := httptest.NewRecorder()
+	c := e.NewContext(req,res)
+	c.SetPath("api/v1/movements/:id")
+	c.SetParamNames("id")
+	c.SetParamValues("12")
+
+	assert.NoError(t, controllers.MovementController.DeleteMovementById(c))
 	assert.Equal(t, http.StatusInternalServerError, res.Code)
 }

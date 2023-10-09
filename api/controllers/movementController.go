@@ -76,9 +76,12 @@ func (c *movementController) DeleteMovementById(ctx echo.Context) error {
 
 	err = c.MovementService.DeleteMovement(id);
 
-	if err != nil {
+	if err == sql.ErrNoRows {
+		return ctx.JSON(http.StatusNotFound, "not found")
+	} else if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, err.Error())
 	}
 
 	return ctx.JSON(http.StatusOK, "OK");
 }
+
