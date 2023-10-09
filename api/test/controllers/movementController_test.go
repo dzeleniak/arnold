@@ -1,7 +1,9 @@
 package controllers
 
 import (
+	"bytes"
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"net/http"
 	"net/http/httptest"
@@ -17,6 +19,7 @@ type MockMovementService struct {
 	services.MovementService
 	MockGetMovements func() ([]models.Movement, error)
 	MockDeleteMovementById func(id int) error
+	MockCreateMovement func(m *models.Movement) (int64, error)
 }
 
 func (m *MockMovementService) GetMovements() ([]models.Movement, error) {
@@ -25,6 +28,37 @@ func (m *MockMovementService) GetMovements() ([]models.Movement, error) {
 
 func (m *MockMovementService) DeleteMovement(id int) error {
 	return m.MockDeleteMovementById(id)
+}
+
+func (m *MockMovementService) CreateMovement(movement *models.Movement) (int64, error) {
+	return m.MockCreateMovement(movement)
+}
+
+func TestCreateMovementSuccessCase(t *testing.T) {
+	s := &MockMovementService{
+		MockCreateMovement: func(m *models.Movement) (int64, error) {
+			return 1, nil;
+		},
+	}
+
+	mockService := &services.Services{ Movement: s}
+
+	e := controllers.Echo()
+	controllers := controllers.New(mockService)
+	
+	bodyObj := map[string]string{
+		"name" : "asdfasdf",
+	}
+
+	body, _ := json.Marshal(bodyObj);
+	
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/movements", bytes.NewReader(body))
+	req.Header.Add("Content-type", "application/json")
+	res := httptest.NewRecorder()
+
+	c := e.NewContext(req, res)
+	assert.NoError(t, controllers.MovementController.CreateMovement(c))
+	assert.Equal(t, http.StatusOK, res.Code)
 }
 
 func TestGetMovementsSuccessCase(t *testing.T) {
